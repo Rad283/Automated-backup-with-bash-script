@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Folder you want to backup 
+input_file=""
+
+# Input Telegram bot token and chat ID that will send output
+BOT_TOKEN=""
+CHAT_ID=""
+
+# Create the archive file name based on the input_file name
+archive_file="${input_file}_$(date +%d-%m-%Y).tar.gz"
+
+#Create encrypted file name
+encrypted_file="${archive_file}.gpg"
+file_name=$(basename "$encrypted_file")
+
+
+# Create the archive using tar with gzip 
+tar -czvf "$archive_file" -C "$input_file/" . 
+
+# Encrypt the archive using GPG
+gpg --encrypt --recipient YOUR_RECEPIENT_EMAIL --trust-model always "$archive_file"
+
+# Delete the original archive file
+rm "$archive_file"
+
+# Move encrypted to external media
+mv "$encrypted_file" "/media/external_hdd_local-backup"
+
+# Syncronize extenal media with nfs folder
+rsync -av "/media/external_hdd_local-backup/" "/media/backup_dir/"
+
+#check if that files existed on nfs folder
+if [ -f "/media/backup_dir/$file_name" ]; then
+  output="$file_name has been created successfully. Backup completed."
+else
+  output="Erorr, $file_name does not exist. Backup Failed!"
+fi
+
+#Send output to telegram
+curl --silent --data "chat_id=$CHAT_ID&text=$output" "https://api.telegram.org/bot$BOT_TOKEN/sendMessage"
+
+echo "script success"
+
+echo "$file_name"
+
