@@ -3,7 +3,7 @@
 # Folder you want to backup 
 input_file=""
 
-# Input Telegram bot token and chat ID that will send output
+# Input Telegram bot token and group chat ID that will send output
 BOT_TOKEN=""
 CHAT_ID=""
 
