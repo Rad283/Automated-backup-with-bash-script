@@ -1,1 +1,1 @@
-Read comment on rad-backup script 
+Read comments in rad-backup script 
